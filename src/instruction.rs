@@ -121,18 +121,30 @@ impl<'a> LogStack<'a> {
             return;
         }
         loop {
-            let log = logs.next().unwrap();
-
-            if log.is_truncated() {
-                self.is_truncated = true;
-                break;
-            } else if log.is_invoke() {
-                self.stack.push(vec![log]);
-                break;
-            } else {
-                self.stack.last_mut().unwrap().push(log);
+            match logs.next() {
+                Some(log) => {
+                    if log.is_truncated() {
+                        self.is_truncated = true;
+                        break;
+                    } else if log.is_invoke() {
+                        self.stack.push(vec![log]);
+                        break;
+                    } else {
+                        if let Some(last) = self.stack.last_mut() {
+                            last.push(log);
+                        } else {
+                            // 初始化堆栈
+                            self.stack.push(vec![log]);
+                        }
+                    }
+                }
+                None => {
+                    // 迭代器耗尽，退出循环
+                    break;
+                }
             }
         }
+
     }
 
     pub fn close<I>(&mut self, logs: &mut Peekable<I>, program_id: PubkeyRef) -> Option<Vec<Log<'a>>>

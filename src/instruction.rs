@@ -149,24 +149,38 @@ impl<'a> LogStack<'a> {
             return None;
         }
 
-        while let Some(log) = logs.next() {
+        loop {
+            // 检查 logs.next() 返回值
+            let log = match logs.next() {
+                Some(log) => log,
+                None => {
+                    // 如果迭代器耗尽，返回空值或其他处理
+                    return None;
+                }
+            };
+
             if log.is_truncated() {
                 self.is_truncated = true;
                 return None;
             } else if log.is_invoke() {
                 panic!("Unexpected invoke log");
             }
-        
+
+            let is_success = log.is_success();
+
+            // 安全地操作 self.stack
             if let Some(last) = self.stack.last_mut() {
-                last.push(log.clone()); // 通过克隆避免所有权转移
+                last.push(log);
             } else {
-                self.stack.push(vec![log.clone()]); // 通过克隆避免所有权转移
+                // 如果堆栈为空，初始化堆栈
+                self.stack.push(vec![log]);
             }
-        
-            if log.is_success() {
+
+            if is_success {
                 return self.stack.pop();
             }
         }
+
 
     }
 }

@@ -158,9 +158,7 @@ impl<'a> LogStack<'a> {
             return None;
         }
 
-        loop {
-            let log = logs.next().unwrap();
-
+        while let Some(log) = logs.next() {
             if log.is_truncated() {
                 self.is_truncated = true;
                 return None;
@@ -169,11 +167,19 @@ impl<'a> LogStack<'a> {
             }
 
             let is_success = log.is_success();
-            self.stack.last_mut().unwrap().push(log);
+
+            if let Some(last) = self.stack.last_mut() {
+                last.push(log);
+            } else {
+                self.stack.push(vec![log]);
+            }
+
             if is_success {
-                return self.stack.pop()
+                return self.stack.pop();
             }
         }
+
+        None
     }
 }
 

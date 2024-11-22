@@ -176,7 +176,7 @@ impl<'a> LogStack<'a> {
                 return self.stack.pop();
             }
         }
-
+        None
     }
 }
 

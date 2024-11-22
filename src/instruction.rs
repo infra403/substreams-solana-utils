@@ -120,19 +120,22 @@ impl<'a> LogStack<'a> {
         if PROGRAMS_WITHOUT_LOGGING.iter().any(|x| *x == program_id) || self.is_truncated {
             return;
         }
-        loop {
-            let log = logs.next().unwrap();
-
-            if log.is_truncated() {
-                self.is_truncated = true;
-                break;
-            } else if log.is_invoke() {
-                self.stack.push(vec![log]);
-                break;
+while let Some(log) = logs.next() {
+        if log.is_truncated() {
+            self.is_truncated = true;
+            break;
+        } else if log.is_invoke() {
+            self.stack.push(vec![log]);
+            break;
+        } else {
+            if let Some(last) = self.stack.last_mut() {
+                last.push(log);
             } else {
-                self.stack.last_mut().unwrap().push(log);
+                // 如果堆栈为空，处理逻辑
+                self.stack.push(vec![log]);
             }
         }
+    }
     }
 
     pub fn close<I>(&mut self, logs: &mut Peekable<I>, program_id: PubkeyRef) -> Option<Vec<Log<'a>>>

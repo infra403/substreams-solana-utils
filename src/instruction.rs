@@ -156,18 +156,18 @@ impl<'a> LogStack<'a> {
             } else if log.is_invoke() {
                 panic!("Unexpected invoke log");
             }
-    
+        
             if let Some(last) = self.stack.last_mut() {
-                last.push(log);
+                last.push(log.clone()); // 通过克隆避免所有权转移
             } else {
-                // 如果堆栈为空时出现了日志，初始化堆栈
-                self.stack.push(vec![log]);
+                self.stack.push(vec![log.clone()]); // 通过克隆避免所有权转移
             }
-    
+        
             if log.is_success() {
                 return self.stack.pop();
             }
         }
+
     }
 }
 

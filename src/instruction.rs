@@ -120,22 +120,19 @@ impl<'a> LogStack<'a> {
         if PROGRAMS_WITHOUT_LOGGING.iter().any(|x| *x == program_id) || self.is_truncated {
             return;
         }
-        while let Some(log) = logs.next() {
-                if log.is_truncated() {
-                    self.is_truncated = true;
-                    break;
-                } else if log.is_invoke() {
-                    self.stack.push(vec![log]);
-                    break;
-                } else {
-                    if let Some(last) = self.stack.last_mut() {
-                        last.push(log);
-                    } else {
-                        // 如果堆栈为空，处理逻辑
-                        self.stack.push(vec![log]);
-                    }
-                }
+        loop {
+            let log = logs.next().unwrap();
+
+            if log.is_truncated() {
+                self.is_truncated = true;
+                break;
+            } else if log.is_invoke() {
+                self.stack.push(vec![log]);
+                break;
+            } else {
+                self.stack.last_mut().unwrap().push(log);
             }
+        }
     }
 
     pub fn close<I>(&mut self, logs: &mut Peekable<I>, program_id: PubkeyRef) -> Option<Vec<Log<'a>>>
@@ -150,10 +147,7 @@ impl<'a> LogStack<'a> {
         }
 
         loop {
-            let log = match logs.next() {
-                Some(log) => log,
-                None => return None,
-            };
+            let log = logs.next().unwrap();
 
             if log.is_truncated() {
                 self.is_truncated = true;
@@ -162,21 +156,12 @@ impl<'a> LogStack<'a> {
                 panic!("Unexpected invoke log");
             }
 
-            // 提前借用 `log.is_success()`
             let is_success = log.is_success();
-
-            // 将 `log` 的所有权转移到堆栈
-            if let Some(last) = self.stack.last_mut() {
-                last.push(log);
-            } else {
-                self.stack.push(vec![log]);
-            }
-
+            self.stack.last_mut().unwrap().push(log);
             if is_success {
-                return self.stack.pop();
+                return self.stack.pop()
             }
         }
-        None
     }
 }
 

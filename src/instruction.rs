@@ -149,22 +149,28 @@ while let Some(log) = logs.next() {
             return None;
         }
 
-        loop {
-            let log = logs.next().unwrap();
-
-            if log.is_truncated() {
-                self.is_truncated = true;
-                return None;
-            } else if log.is_invoke() {
-                panic!("Unexpected invoke log");
-            }
-
-            let is_success = log.is_success();
-            self.stack.last_mut().unwrap().push(log);
-            if is_success {
-                return self.stack.pop()
-            }
+        while let Some(log) = logs.next() {
+        if log.is_truncated() {
+            self.is_truncated = true;
+            return None;
+        } else if log.is_invoke() {
+            panic!("Unexpected invoke log");
         }
+
+        if let Some(last) = self.stack.last_mut() {
+            last.push(log);
+        } else {
+            // 如果堆栈为空时出现了日志，初始化堆栈
+            self.stack.push(vec![log]);
+        }
+
+        if log.is_success() {
+            return self.stack.pop();
+        }
+    }
+
+    // 如果迭代器耗尽，没有日志可处理，返回空结果
+    None
     }
 }
 

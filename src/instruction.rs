@@ -150,13 +150,9 @@ impl<'a> LogStack<'a> {
         }
 
         loop {
-            // 检查 logs.next() 返回值
             let log = match logs.next() {
                 Some(log) => log,
-                None => {
-                    // 如果迭代器耗尽，返回空值或其他处理
-                    return None;
-                }
+                None => return None,
             };
 
             if log.is_truncated() {
@@ -166,13 +162,13 @@ impl<'a> LogStack<'a> {
                 panic!("Unexpected invoke log");
             }
 
+            // 提前借用 `log.is_success()`
             let is_success = log.is_success();
 
-            // 安全地操作 self.stack
+            // 将 `log` 的所有权转移到堆栈
             if let Some(last) = self.stack.last_mut() {
                 last.push(log);
             } else {
-                // 如果堆栈为空，初始化堆栈
                 self.stack.push(vec![log]);
             }
 
@@ -180,7 +176,6 @@ impl<'a> LogStack<'a> {
                 return self.stack.pop();
             }
         }
-
 
     }
 }

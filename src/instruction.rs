@@ -120,22 +120,22 @@ impl<'a> LogStack<'a> {
         if PROGRAMS_WITHOUT_LOGGING.iter().any(|x| *x == program_id) || self.is_truncated {
             return;
         }
-while let Some(log) = logs.next() {
-        if log.is_truncated() {
-            self.is_truncated = true;
-            break;
-        } else if log.is_invoke() {
-            self.stack.push(vec![log]);
-            break;
-        } else {
-            if let Some(last) = self.stack.last_mut() {
-                last.push(log);
-            } else {
-                // 如果堆栈为空，处理逻辑
-                self.stack.push(vec![log]);
+        while let Some(log) = logs.next() {
+                if log.is_truncated() {
+                    self.is_truncated = true;
+                    break;
+                } else if log.is_invoke() {
+                    self.stack.push(vec![log]);
+                    break;
+                } else {
+                    if let Some(last) = self.stack.last_mut() {
+                        last.push(log);
+                    } else {
+                        // 如果堆栈为空，处理逻辑
+                        self.stack.push(vec![log]);
+                    }
+                }
             }
-        }
-    }
     }
 
     pub fn close<I>(&mut self, logs: &mut Peekable<I>, program_id: PubkeyRef) -> Option<Vec<Log<'a>>>
@@ -150,27 +150,24 @@ while let Some(log) = logs.next() {
         }
 
         while let Some(log) = logs.next() {
-        if log.is_truncated() {
-            self.is_truncated = true;
-            return None;
-        } else if log.is_invoke() {
-            panic!("Unexpected invoke log");
+            if log.is_truncated() {
+                self.is_truncated = true;
+                return None;
+            } else if log.is_invoke() {
+                panic!("Unexpected invoke log");
+            }
+    
+            if let Some(last) = self.stack.last_mut() {
+                last.push(log);
+            } else {
+                // 如果堆栈为空时出现了日志，初始化堆栈
+                self.stack.push(vec![log]);
+            }
+    
+            if log.is_success() {
+                return self.stack.pop();
+            }
         }
-
-        if let Some(last) = self.stack.last_mut() {
-            last.push(log);
-        } else {
-            // 如果堆栈为空时出现了日志，初始化堆栈
-            self.stack.push(vec![log]);
-        }
-
-        if log.is_success() {
-            return self.stack.pop();
-        }
-    }
-
-    // 如果迭代器耗尽，没有日志可处理，返回空结果
-    None
     }
 }
 

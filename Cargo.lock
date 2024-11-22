@@ -641,7 +641,30 @@ dependencies = [
  "prost 0.11.9",
  "prost-build 0.11.9",
  "prost-types 0.11.9",
- "substreams-macro",
+ "substreams-macro 0.5.22",
+ "thiserror",
+]
+
+[[package]]
+name = "substreams"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5bb63116b90d4c174114fb237a8916dd995c939874f7576333990a44d78b642a"
+dependencies = [
+ "anyhow",
+ "bigdecimal",
+ "hex",
+ "hex-literal",
+ "num-bigint",
+ "num-integer",
+ "num-traits",
+ "pad",
+ "pest",
+ "pest_derive",
+ "prost 0.13.3",
+ "prost-build 0.13.3",
+ "prost-types 0.13.3",
+ "substreams-macro 0.6.0",
  "thiserror",
 ]
 
@@ -658,26 +681,28 @@ dependencies = [
 ]
 
 [[package]]
-name = "substreams-solana"
-version = "0.13.0"
-source = "git+https://github.com/streamingfast/substreams-solana?branch=master#0d3d087d90a927d17435653b3a7fc4ef6e2758a6"
+name = "substreams-macro"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f36f36e9da94db29f49daf3ab6b47b529b57c43fc5d58bc35b160aaad1a7233f"
 dependencies = [
- "anyhow",
- "num_enum",
- "substreams",
- "substreams-solana-core 0.13.0",
- "substreams-solana-macro",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+ "thiserror",
 ]
 
 [[package]]
-name = "substreams-solana-core"
-version = "0.13.0"
-source = "git+https://github.com/streamingfast/substreams-solana?branch=master#0d3d087d90a927d17435653b3a7fc4ef6e2758a6"
+name = "substreams-solana"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9bc14193c089465f3318be2215a90803e0bf2f16477557142648dbbe451ad6bc"
 dependencies = [
- "bs58 0.4.0",
- "prost 0.11.9",
- "prost-build 0.11.9",
- "prost-types 0.11.9",
+ "anyhow",
+ "num_enum",
+ "substreams 0.6.0",
+ "substreams-solana-core",
+ "substreams-solana-macro",
 ]
 
 [[package]]
@@ -694,8 +719,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-solana-macro"
-version = "0.13.0"
-source = "git+https://github.com/streamingfast/substreams-solana?branch=master#0d3d087d90a927d17435653b3a7fc4ef6e2758a6"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d28bba84dc05f4644ef9d1505162c4628f8fce2436bb15c047d0df3911dad142"
 dependencies = [
  "bs58 0.4.0",
 ]
@@ -709,9 +735,9 @@ dependencies = [
  "borsh",
  "bs58 0.5.1",
  "regex",
- "substreams",
+ "substreams 0.5.22",
  "substreams-solana",
- "substreams-solana-core 0.14.0",
+ "substreams-solana-core",
 ]
 
 [[package]]

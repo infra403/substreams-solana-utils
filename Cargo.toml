@@ -9,7 +9,7 @@ name = "substreams_solana_utils"
 [dependencies]
 substreams = "^0.5.0"
 substreams-solana-core = "=0.14.0"
-substreams-solana = { git = "https://github.com/streamingfast/substreams-solana", branch = "master" }
+substreams-solana = "0.14.0"
 bs58 = "0.5.0"
 regex = "1.10.5"
 base64 = "0.22.1"
